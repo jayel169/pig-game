@@ -1,0 +1,463 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <meta http-equiv="X-UA-Compatible" content="ie=edge" />
+    <title>Pig Game - Player 1 vs Player 2</title>
+   <link href="https://fonts.googleapis.com/css2?family=Press+Start+2P&display=swap" rel="stylesheet">
+    <style>
+      * {
+        margin: 0;
+        padding: 0;
+        box-sizing: inherit;
+      }
+
+      html {
+        font-size: 62.5%;
+        box-sizing: border-box;
+      }
+
+      body {
+        font-family: 'Press Start 2P', cursive;
+        color: #ffffff;
+        background: linear-gradient(135deg, #1e3c72, #2a5298);
+        min-height: 100vh;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        overflow-x: hidden;
+        padding: 1rem;
+      }
+
+      main {
+        position: relative;
+        width: min(100rem, 95vw);
+        min-height: 60rem;
+        background-color: rgba(255, 255, 255, 0.1);
+        box-shadow: 0 2rem 4rem rgba(0, 0, 0, 0.3);
+        border-radius: 15px;
+        overflow: hidden;
+        display: flex;
+        flex-direction: row;
+      }
+
+      .player {
+        flex: 50%;
+        padding: 5rem 2rem;
+        display: flex;
+        flex-direction: column;
+        align-items: center;
+        transition: all 0.5s ease;
+      }
+
+      .name {
+        font-size: clamp(2.5rem, 3.5vw, 3.2rem);
+        text-transform: uppercase;
+        letter-spacing: 2px;
+        font-weight: 300;
+        margin-bottom: 1.5rem;
+        color: #ffffff;
+        text-shadow: 0 2px 4px rgba(0, 0, 0, 0.3);
+      }
+
+      .score {
+        font-size: clamp(5rem, 7vw, 6.5rem);
+        font-weight: 400;
+        color: #ff6f61;
+        margin-bottom: auto;
+        text-shadow: 0 2px 4px rgba(0, 0, 0, 0.3);
+      }
+
+      .player--active {
+        background-color: rgba(255, 255, 255, 0.15);
+        box-shadow: 0 0 20px rgba(255, 107, 97, 0.5);
+        border: 2px solid #ff6f61;
+        border-radius: 10px;
+      }
+
+      .player--active .name {
+        font-weight: 700;
+      }
+
+      .player--winner {
+        background-color: #1a1a1a;
+        animation: pulse 2s infinite;
+      }
+
+      .player--winner .name {
+        font-weight: 700;
+        color: #ff6f61;
+      }
+
+      .current {
+        background: linear-gradient(135deg, #ff6f61, #de4d4d);
+        border-radius: 10px;
+        color: #ffffff;
+        width: 70%;
+        padding: 1.5rem;
+        text-align: center;
+        opacity: 0.9;
+        box-shadow: 0 4px 10px rgba(0, 0, 0, 0.3);
+      }
+
+      .current-label {
+        text-transform: uppercase;
+        font-size: clamp(1.4rem, 2vw, 1.6rem);
+        color: #f0f0f0;
+        margin-bottom: 0.5rem;
+      }
+
+      .current-score {
+        font-size: clamp(2.5rem, 3.5vw, 3rem);
+        font-weight: 600;
+      }
+
+      .btn {
+        position: absolute;
+        left: 50%;
+        transform: translateX(-50%);
+        background: linear-gradient(135deg, #ff6f61, #de4d4d);
+        border: none;
+        color: #ffffff;
+        font-family: 'Poppins', sans-serif;
+        font-size: clamp(1.6rem, 2vw, 1.8rem);
+        text-transform: uppercase;
+        cursor: pointer;
+        padding: 1rem 3rem;
+        border-radius: 50rem;
+        box-shadow: 0 4px 15px rgba(0, 0, 0, 0.3);
+        transition: all 0.3s ease;
+        min-width: 12rem;
+        touch-action: manipulation;
+      }
+
+      .btn:hover {
+        transform: translateX(-50%) scale(1.05);
+        box-shadow: 0 6px 20px rgba(0, 0, 0, 0.4);
+        background: linear-gradient(135deg, #ff8a75, #f76c6c);
+      }
+
+      .btn:active {
+        transform: translateX(-50%) scale(0.95);
+        box-shadow: 0 2px 10px rgba(0, 0, 0, 0.3);
+      }
+
+      .btn--new {
+        top: 2rem;
+      }
+
+      .btn--roll {
+        top: 35rem;
+      }
+
+      .btn--hold {
+        top: 42rem;
+      }
+
+      .dice {
+        position: absolute;
+        left: 50%;
+        top: 15rem;
+        transform: translateX(-50%);
+        width: clamp(8rem, 12vw, 10rem);
+        height: clamp(8rem, 12vw, 10rem);
+        box-shadow: 0 2rem 5rem rgba(0, 0, 0, 0.4);
+        border-radius: 10px;
+        transition: transform 0.3s ease;
+        background-color: #ffffff;
+        object-fit: contain;
+      }
+
+      .dice.rolling {
+        animation: spin 0.5s ease-in-out;
+      }
+
+      .hidden {
+        display: none;
+      }
+
+      @keyframes spin {
+        0% { transform: translateX(-50%) rotate(0deg); }
+        50% { transform: translateX(-50%) rotate(180deg) scale(1.2); }
+        100% { transform: translateX(-50%) rotate(360deg); }
+      }
+
+      @keyframes pulse {
+        0% { box-shadow: 0 0 20px rgba(255, 107, 97, 0.5); }
+        50% { box-shadow: 0 0 30px rgba(255, 107, 97, 0.8); }
+        100% { box-shadow: 0 0 20px rgba(255, 107, 97, 0.5); }
+      }
+
+      @keyframes confetti {
+        0% { transform: translateY(-100vh) rotate(0deg); }
+        100% { transform: translateY(100vh) rotate(360deg); }
+      }
+
+      .confetti {
+        position: absolute;
+        width: 10px;
+        height: 10px;
+        background: #ff6f61;
+        opacity: 0.7;
+        animation: confetti 3s linear infinite;
+      }
+
+      /* Tablet and Phone (≤768px) */
+      @media (max-width: 768px) {
+        main {
+          flex-direction: column;
+          min-height: 80vh;
+          padding: 2rem;
+        }
+
+        .player {
+          flex: none;
+          padding: 3rem 1rem;
+          width: 100%;
+        }
+
+        .name {
+          font-size: clamp(2rem, 5vw, 2.5rem);
+        }
+
+        .score {
+          font-size: clamp(4rem, 8vw, 5rem);
+        }
+
+        .current {
+          width: 80%;
+          padding: 1rem;
+        }
+
+        .current-label {
+          font-size: clamp(1.2rem, 2.5vw, 1.4rem);
+        }
+
+        .current-score {
+          font-size: clamp(2rem, 4vw, 2.5rem);
+        }
+
+        .btn {
+          padding: 0.8rem 2rem;
+          min-width: 10rem;
+        }
+
+        .btn--new {
+          top: 1rem;
+        }
+
+        .btn--roll {
+          top: auto;
+          bottom: 12rem;
+        }
+
+        .btn--hold {
+          top: auto;
+          bottom: 4rem;
+        }
+
+        .dice {
+          top: auto;
+          bottom: 22rem;
+          width: clamp(6rem, 15vw, 8rem);
+          height: clamp(6rem, 15vw, 8rem);
+        }
+      }
+
+      /* Small Phones (≤480px) */
+      @media (max-width: 480px) {
+        html {
+          font-size: 55%;
+        }
+
+        main {
+          padding: 1rem;
+          min-height: 90vh;
+        }
+
+        .player {
+          padding: 2rem 0.5rem;
+        }
+
+        .name {
+          font-size: clamp(1.8rem, 4.5vw, 2rem);
+        }
+
+        .score {
+          font-size: clamp(3.5rem, 7vw, 4rem);
+        }
+
+        .current {
+          width: 90%;
+        }
+
+        .btn {
+          font-size: clamp(1.4rem, 3vw, 1.6rem);
+          padding: 0.7rem 1.5rem;
+          min-width: 8rem;
+        }
+
+        .dice {
+          width: clamp(5rem, 12vw, 6rem);
+          height: clamp(5rem, 12vw, 6rem);
+          bottom: 20rem;
+        }
+      }
+
+      /* Large Laptops (>1200px) */
+      @media (min-width: 1200px) {
+        main {
+          width: min(110rem, 90vw);
+        }
+
+        .name {
+          font-size: 4rem;
+        }
+
+        .score {
+          font-size: 8rem;
+        }
+
+        .dice {
+          width: 12rem;
+          height: 12rem;
+        }
+      }
+    </style>
+  </head>
+  <body>
+    <main>
+      <section class="player player--0 player--active">
+        <h2 class="name" id="name--0">player 1</h2>
+        <p class="score" id="score--0">0</p>
+        <div class="current">
+          <p class="current-label">Current</p>
+          <p class="current-score" id="current--0">0</p>
+        </div>
+      </section>
+      <section class="player player--1">
+        <h2 class="name" id="name--1">Player 2</h2>
+        <p class="score" id="score--1">0</p>
+        <div class="current">
+          <p class="current-label">Current</p>
+          <p class="current-score" id="current--1">0</p>
+        </div>
+      </section>
+      <img src="https://upload.wikimedia.org/wikipedia/commons/1/1b/Dice-1-b.svg" alt="Playing dice" class="dice hidden" />
+      <button class="btn btn--new">🔄 New Game</button>
+      <button class="btn btn--roll">🎲 Roll Dice</button>
+      <button class="btn btn--hold">📥 Hold</button>
+    </main>
+    <script>
+      'use strict';
+
+      const player0El = document.querySelector('.player--0');
+      const player1El = document.querySelector('.player--1');
+      const score0El = document.querySelector('#score--0');
+      const score1El = document.getElementById('score--1');
+      const current0El = document.getElementById('current--0');
+      const current1El = document.getElementById('current--1');
+      const diceEl = document.querySelector('.dice');
+      const btnNew = document.querySelector('.btn--new');
+      const btnRoll = document.querySelector('.btn--roll');
+      const btnHold = document.querySelector('.btn--hold');
+      const mainEl = document.querySelector('main');
+
+      let scores, currentScore, activePlayer, playing;
+
+      const diceImages = [
+        'https://upload.wikimedia.org/wikipedia/commons/1/1b/Dice-1-b.svg',
+        'https://upload.wikimedia.org/wikipedia/commons/5/5f/Dice-2-b.svg',
+        'https://upload.wikimedia.org/wikipedia/commons/b/b1/Dice-3-b.svg',
+        'https://upload.wikimedia.org/wikipedia/commons/f/fd/Dice-4-b.svg',
+        'https://upload.wikimedia.org/wikipedia/commons/0/08/Dice-5-b.svg',
+        'https://upload.wikimedia.org/wikipedia/commons/2/26/Dice-6-b.svg'
+      ];
+
+      const init = function () {
+        scores = [0, 0];
+        currentScore = 0;
+        activePlayer = 0;
+        playing = true;
+
+        score0El.textContent = 0;
+        score1El.textContent = 0;
+        current0El.textContent = 0;
+        current1El.textContent = 0;
+
+        diceEl.classList.add('hidden');
+        player0El.classList.remove('player--winner');
+        player1El.classList.remove('player--winner');
+        player0El.classList.add('player--active');
+        player1El.classList.remove('player--active');
+
+        document.querySelectorAll('.confetti').forEach(el => el.remove());
+      };
+      init();
+
+      const switchPlayer = function () {
+        document.getElementById(`current--${activePlayer}`).textContent = 0;
+        currentScore = 0;
+        activePlayer = activePlayer === 0 ? 1 : 0;
+        player0El.classList.toggle('player--active');
+        player1El.classList.toggle('player--active');
+      };
+
+      const createConfetti = function () {
+        for (let i = 0; i < 50; i++) {
+          const confetti = document.createElement('div');
+          confetti.classList.add('confetti');
+          confetti.style.left = `${Math.random() * 100}vw`;
+          confetti.style.animationDelay = `${Math.random() * 2}s`;
+          confetti.style.background = ['#ff6f61', '#ffffff', '#ffd700'][Math.floor(Math.random() * 3)];
+          mainEl.appendChild(confetti);
+          setTimeout(() => confetti.remove(), 3000);
+        }
+      };
+
+      btnRoll.addEventListener('click', function () {
+        if (playing) {
+          const dice = Math.trunc(Math.random() * 6) + 1;
+          diceEl.classList.remove('hidden');
+          diceEl.classList.add('rolling');
+          diceEl.src = diceImages[dice - 1];
+
+          diceEl.onerror = () => console.error(`Failed to load dice image: ${diceImages[dice - 1]}`);
+
+          setTimeout(() => diceEl.classList.remove('rolling'), 500);
+
+          if (dice !== 1) {
+            currentScore += dice;
+            document.getElementById(`current--${activePlayer}`).textContent = currentScore;
+          } else {
+            switchPlayer();
+          }
+        }
+      });
+
+      btnHold.addEventListener('click', function () {
+        if (playing) {
+          scores[activePlayer] += currentScore;
+          document.getElementById(`score--${activePlayer}`).textContent = scores[activePlayer];
+
+          if (scores[activePlayer] >= 100) {
+            playing = false;
+            diceEl.classList.add('hidden');
+            document.querySelector(`.player--${activePlayer}`).classList.add('player--winner');
+            document.querySelector(`.player--${activePlayer}`).classList.remove('player--active');
+            createConfetti();
+          } else {
+            switchPlayer();
+          }
+        }
+      });
+
+      btnNew.addEventListener('click', init);
+
+      if (!player0El || !player1El || !score0El || !score1El || !current0El || !current1El || !diceEl || !btnNew || !btnRoll || !btnHold) {
+        console.error('One or more DOM elements not found');
+      }
+    </script>
+  </body>
+</html>
