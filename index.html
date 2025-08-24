@@ -5,7 +5,7 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
     <meta http-equiv="X-UA-Compatible" content="ie=edge" />
     <title>Pig Game - Player 1 vs Player 2</title>
-   <link href="https://fonts.googleapis.com/css2?family=Press+Start+2P&display=swap" rel="stylesheet">
+    <link href="https://fonts.googleapis.com/css2?family=Press+Start+2P&display=swap" rel="stylesheet">
     <style>
       * {
         margin: 0;
@@ -120,7 +120,7 @@
         background: linear-gradient(135deg, #ff6f61, #de4d4d);
         border: none;
         color: #ffffff;
-        font-family: 'Poppins', sans-serif;
+        font-family: 'Press Start 2P', cursive;
         font-size: clamp(1.6rem, 2vw, 1.8rem);
         text-transform: uppercase;
         cursor: pointer;
@@ -175,6 +175,81 @@
 
       .hidden {
         display: none;
+      }
+
+      /* Modal Styles */
+      .modal {
+        position: fixed;
+        top: 0;
+        left: 0;
+        width: 100%;
+        height: 100%;
+        background-color: rgba(0, 0, 0, 0.7);
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        z-index: 1000;
+      }
+
+      .modal-content {
+        background: linear-gradient(135deg, #1e3c72, #2a5298);
+        border-radius: 15px;
+        padding: 2rem;
+        width: min(80rem, 90vw);
+        max-height: 80vh;
+        overflow-y: auto;
+        box-shadow: 0 4px 20px rgba(0, 0, 0, 0.5);
+        color: #ffffff;
+        text-align: center;
+      }
+
+      .modal-content h2 {
+        font-size: clamp(2.5rem, 4vw, 3rem);
+        margin-bottom: 1.5rem;
+        text-shadow: 0 2px 4px rgba(0, 0, 0, 0.3);
+      }
+
+      .modal-content p {
+        font-size: clamp(1.4rem, 2vw, 1.6rem);
+        margin-bottom: 1rem;
+        line-height: 1.6;
+      }
+
+      .modal-content ul {
+        text-align: left;
+        margin: 1rem auto;
+        padding-left: 2rem;
+        width: fit-content;
+      }
+
+      .modal-content li {
+        font-size: clamp(1.4rem, 2vw, 1.6rem);
+        margin-bottom: 0.5rem;
+      }
+
+      .modal-close {
+        background: linear-gradient(135deg, #ff6f61, #de4d4d);
+        border: none;
+        color: #ffffff;
+        font-family: 'Press Start 2P', cursive;
+        font-size: clamp(1.4rem, 2vw, 1.6rem);
+        padding: 1rem 2rem;
+        border-radius: 50rem;
+        cursor: pointer;
+        margin-top: 2rem;
+        box-shadow: 0 4px 10px rgba(0, 0, 0, 0.3);
+        transition: all 0.3s ease;
+      }
+
+      .modal-close:hover {
+        background: linear-gradient(135deg, #ff8a75, #f76c6c);
+        transform: scale(1.05);
+        box-shadow: 0 6px 15px rgba(0, 0, 0, 0.4);
+      }
+
+      .modal-close:active {
+        transform: scale(0.95);
+        box-shadow: 0 2px 10px rgba(0, 0, 0, 0.3);
       }
 
       @keyframes spin {
@@ -263,6 +338,25 @@
           width: clamp(6rem, 15vw, 8rem);
           height: clamp(6rem, 15vw, 8rem);
         }
+
+        .modal-content {
+          width: 90vw;
+          padding: 1.5rem;
+        }
+
+        .modal-content h2 {
+          font-size: clamp(2rem, 3.5vw, 2.5rem);
+        }
+
+        .modal-content p,
+        .modal-content li {
+          font-size: clamp(1.2rem, 2.5vw, 1.4rem);
+        }
+
+        .modal-close {
+          font-size: clamp(1.2rem, 2.5vw, 1.4rem);
+          padding: 0.8rem 1.5rem;
+        }
       }
 
       /* Small Phones (≤480px) */
@@ -303,6 +397,25 @@
           height: clamp(5rem, 12vw, 6rem);
           bottom: 20rem;
         }
+
+        .modal-content {
+          width: 95vw;
+          padding: 1rem;
+        }
+
+        .modal-content h2 {
+          font-size: clamp(1.8rem, 4vw, 2rem);
+        }
+
+        .modal-content p,
+        .modal-content li {
+          font-size: clamp(1rem, 2.2vw, 1.2rem);
+        }
+
+        .modal-close {
+          font-size: clamp(1rem, 2.2vw, 1.2rem);
+          padding: 0.7rem 1.2rem;
+        }
       }
 
       /* Large Laptops (>1200px) */
@@ -322,6 +435,24 @@
         .dice {
           width: 12rem;
           height: 12rem;
+        }
+
+        .modal-content {
+          width: min(90rem, 80vw);
+        }
+
+        .modal-content h2 {
+          font-size: 3.5rem;
+        }
+
+        .modal-content p,
+        .modal-content li {
+          font-size: 1.8rem;
+        }
+
+        .modal-close {
+          font-size: 1.8rem;
+          padding: 1.2rem 2.5rem;
         }
       }
     </style>
@@ -349,6 +480,31 @@
       <button class="btn btn--roll">🎲 Roll Dice</button>
       <button class="btn btn--hold">📥 Hold</button>
     </main>
+
+    <!-- Instructions Modal -->
+    <div class="modal" id="instructionsModal">
+      <div class="modal-content">
+        <h2>Pig Game Instructions</h2>
+        <p><strong>Objective:</strong> Be the first player to reach <strong>100 points</strong> by rolling a die and accumulating scores.</p>
+        <p><strong>How to Play:</strong></p>
+        <ul>
+          <li><strong>Players:</strong> Two players take turns.</li>
+          <li><strong>Roll Dice:</strong> Click the <strong>Roll Dice</strong> button to roll a die.</li>
+          <li>If you roll a <strong>2-6</strong>, the number is added to your <strong>Current</strong> score.</li>
+          <li>If you roll a <strong>1</strong>, your <strong>Current</strong> score resets to 0, and your turn ends.</li>
+          <li><strong>Hold:</strong> Click the <strong>Hold</strong> button to add your <strong>Current</strong> score to your total score and end your turn.</li>
+          <li><strong>Winning:</strong> The first player to reach <strong>100 points</strong> wins, triggering a celebration with confetti!</li>
+          <li><strong>New Game:</strong> Click the <strong>New Game</strong> button to reset and start a new game.</li>
+        </ul>
+        <p><strong>Tips:</strong></p>
+        <ul>
+          <li>Decide when to <strong>Hold</strong> to secure your points, as rolling a 1 will cost you your turn’s score.</li>
+          <li>Balance risk and reward to outscore your opponent!</li>
+        </ul>
+        <button class="modal-close" id="closeModal">Close</button>
+      </div>
+    </div>
+
     <script>
       'use strict';
 
@@ -363,6 +519,8 @@
       const btnRoll = document.querySelector('.btn--roll');
       const btnHold = document.querySelector('.btn--hold');
       const mainEl = document.querySelector('main');
+      const modal = document.getElementById('instructionsModal');
+      const closeModalBtn = document.getElementById('closeModal');
 
       let scores, currentScore, activePlayer, playing;
 
@@ -393,6 +551,9 @@
         player1El.classList.remove('player--active');
 
         document.querySelectorAll('.confetti').forEach(el => el.remove());
+
+        // Show modal on game initialization
+        modal.style.display = 'flex';
       };
       init();
 
@@ -455,7 +616,12 @@
 
       btnNew.addEventListener('click', init);
 
-      if (!player0El || !player1El || !score0El || !score1El || !current0El || !current1El || !diceEl || !btnNew || !btnRoll || !btnHold) {
+      // Close modal when close button is clicked
+      closeModalBtn.addEventListener('click', function () {
+        modal.style.display = 'none';
+      });
+
+      if (!player0El || !player1El || !score0El || !score1El || !current0El || !current1El || !diceEl || !btnNew || !btnRoll || !btnHold || !modal || !closeModalBtn) {
         console.error('One or more DOM elements not found');
       }
     </script>
